@@ -42,7 +42,20 @@ function resetRollSelection() {
 }
 
 // Inject attribute roll buttons
-document.querySelectorAll('.attribute-name').forEach(nameEl => {
+const attributeElements = document.querySelectorAll('.attribute-name');
+console.log('Found', attributeElements.length, 'attribute elements');
+
+// Wait for page to load and try again
+setTimeout(() => {
+  const delayedAttributeElements = document.querySelectorAll('.attribute-name');
+  
+  if (delayedAttributeElements.length > 0) {
+    setupAttributeButtons();
+  }
+}, 2000);
+
+function setupAttributeButtons() {
+  document.querySelectorAll('.attribute-name').forEach(nameEl => {
   const attrClass = Array.from(nameEl.classList).find(c => c.startsWith('attribute-name-') && c !== 'attribute-name');
   if (!attrClass) return;
   const attrKey = attrClass.replace('attribute-name-', '');
@@ -116,7 +129,20 @@ document.querySelectorAll('.attribute-name').forEach(nameEl => {
     nameEl.appendChild(btn);
   }
 });
+}
 
+// Also run immediately in case elements are already loaded
+setupAttributeButtons();
+
+// Set up weapons with delay
+setTimeout(() => {
+  const weaponElements = document.querySelectorAll('.weapon-name');
+  if (weaponElements.length > 0) {
+    setupWeaponButtons();
+  }
+}, 2000);
+
+function setupWeaponButtons() {
 // For each weapon, find the name, attack skill, and damage.
 document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
   // Find the class that starts with 'weapon-name-' (excluding 'weapon-name' itself)
@@ -260,3 +286,7 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
     }
   }
 });
+}
+
+// Also run weapon setup immediately in case elements are already loaded
+setupWeaponButtons();

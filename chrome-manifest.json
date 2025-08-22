@@ -1,11 +1,5 @@
 {
   "manifest_version": 3,
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "{e2c51695-3541-4b33-8716-d873af91c900}",
-      "strict_min_version": "58.0"
-    }
-  },
   "icons": {
     "16": "icon16.png",
     "24": "icon24.png",
@@ -22,15 +16,15 @@
     "https://app.roll20.net/*"
   ],
   "background": {
-    "scripts": ["background.js"]
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["https://repair-crew-sheets-1zhn.vercel.app/character/*"],
+      "matches": ["https://repair-crew-sheets-1zhn.vercel.app/*"],
       "js": ["content-sheet.js"]
     },
     {
-      "matches": ["https://app.roll20.net/editor/*"],
+      "matches": ["https://app.roll20.net/*"],
       "js": ["content-roll20.js"]
     }
   ]

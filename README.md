@@ -18,17 +18,22 @@ A browser extension that allows you to click skills and weapons in your Repair C
 
    - Download or clone this repository to your computer
 
-2. **Enable Developer Mode**
+2. **Prepare Chrome Manifest**
+
+   - Rename `chrome-manifest.json` to `manifest.json`
+   - (If upgrading from a previous version, delete the old `manifest.json` first)
+
+3. **Enable Developer Mode**
 
    - Open Chrome and go to `chrome://extensions/`
    - Toggle "Developer mode" in the top right corner
 
-3. **Load the Extension**
+4. **Load the Extension**
 
    - Click "Load unpacked"
    - Select the folder containing the extension files (`manifest.json`, etc.)
 
-4. **Verify Installation**
+5. **Verify Installation**
    - The extension should appear in your extensions list
    - Make sure it's enabled (toggle switch is on)
 
@@ -38,20 +43,24 @@ A browser extension that allows you to click skills and weapons in your Repair C
 
    - Download or clone this repository to your computer
 
-2. **Load for Testing**
+2. **Prepare Firefox Manifest**
+
+   - Rename `firefox-manifest.json` to `manifest.json`
+   - (If upgrading from a previous version, delete the old `manifest.json` first)
+
+3. **Load for Testing**
 
    - Open Firefox and go to `about:debugging#/runtime/this-firefox`
    - Click "Load Temporary Add-on"
    - Navigate to the extension folder and select `manifest.json`
 
-3. **Verify Installation**
+4. **Verify Installation**
    - The extension should appear in the "Temporary Extensions" list
    - Note: Temporary extensions are removed when Firefox restarts
 
 #### For Permanent Installation in Firefox
 
-- You'll need to sign the extension through Mozilla's Add-on Developer Hub
-- Or use Firefox Developer Edition for unsigned extensions
+Download the [KPI](https://addons.mozilla.org/en-US/developers/addon/20115464ec4c4235ae98/versions) associated with a specific version to install the extension.
 
 ## Usage
 
@@ -115,7 +124,8 @@ A browser extension that allows you to click skills and weapons in your Repair C
 
 ```
 rc-sheets-extension/
-├── manifest.json          # Extension configuration
+├── chrome-manifest.json   # Chrome extension configuration (rename to manifest.json)
+├── firefox-manifest.json  # Firefox extension configuration (rename to manifest.json)
 ├── background.js          # Message routing between tabs
 ├── content-sheet.js       # Character sheet integration
 ├── content-roll20.js      # Roll20 integration

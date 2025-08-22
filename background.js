@@ -1,12 +1,15 @@
 // Use browser.* for Firefox, chrome.* for Chrome, or use a wrapper for both
 const api = typeof browser !== "undefined" ? browser : chrome;
 
-function sendToRoll20(msg) {
-  api.tabs.query({ url: "https://app.roll20.net/editor/*" }, (tabs) => {
+async function sendToRoll20(msg) {
+  try {
+    const tabs = await api.tabs.query({ url: "https://app.roll20.net/*" });
     if (tabs.length > 0) {
-      api.tabs.sendMessage(tabs[0].id, msg);
+      await api.tabs.sendMessage(tabs[0].id, msg);
     }
-  });
+  } catch (error) {
+    console.error('Background: Error sending message:', error);
+  }
 }
 
 api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
