@@ -107,7 +107,7 @@ function setupAttributeButtons() {
             e.stopPropagation();
             
             // Prompt for bonus dice
-            const bonusInput = prompt(`Rolling ${attrName} (${attrValue}) + ${skillName} (${skillValue})\n\nEnter bonus dice (+ or - value):`);
+            const bonusInput = prompt(`Attribute Roll: ${attrName} (${attrValue}) + ${skillName} (${skillValue})\n\nEnter bonus dice (+ or - value):`);
             if (bonusInput === null) return; // User cancelled
             
             const bonusValue = parseInt(bonusInput, 10) || 0;
@@ -224,7 +224,7 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
       e.stopPropagation();
       
       // Prompt for bonus dice
-      const bonusInput = prompt(`Attack Roll: ${weaponNameEl.textContent.trim()}\n${attackData.attribute} (${attackData.attributeValue}) + ${attackData.skill} (${attackData.skillValue})\n\nEnter bonus dice (+ or - value):`);
+      const bonusInput = prompt(`Attack Roll: ${attackData.attribute} (${attackData.attributeValue}) + ${attackData.skill} (${attackData.skillValue})\n\nEnter bonus dice (+ or - value):`);
       if (bonusInput === null) return; // User cancelled
       
       const bonusValue = parseInt(bonusInput, 10) || 0;
@@ -269,7 +269,7 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
         e.stopPropagation();
         
         // Prompt for bonus damage dice
-        const bonusInput = prompt(`Damage Roll: ${weaponNameEl.textContent.trim()}\nBase: ${damageData.diceCount}D+${damageData.bonus}\n\nEnter bonus damage dice (+ or - value):`);
+        const bonusInput = prompt(`Damage Roll: ${damageData.diceCount}D+${damageData.bonus}\n\nEnter bonus damage dice (+ or - value):`);
         if (bonusInput === null) return; // User cancelled
         
         const bonusValue = parseInt(bonusInput, 10) || 0;
