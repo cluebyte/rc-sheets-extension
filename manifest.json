@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "RC Sheets to Roll20",
+  "version": "1.0",
+  "description": "Click skills in RC Sheets to trigger Roll20 macros.",
+  "permissions": ["tabs", "scripting"],
+  "host_permissions": [
+    "https://repair-crew-sheets-1zhn.vercel.app/*",
+    "https://app.roll20.net/*"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://repair-crew-sheets-1zhn.vercel.app/character/*"],
+      "js": ["content-sheet.js"]
+    },
+    {
+      "matches": ["https://app.roll20.net/editor/*"],
+      "js": ["content-roll20.js"]
+    }
+  ]
+}
