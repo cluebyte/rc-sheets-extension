@@ -38,13 +38,13 @@ function sendMessageToChat(msg) {
 
 api.runtime.onMessage.addListener((msg) => {
   if (msg.type === 'roll-attribute-skill') {
-    const effectiveDice = msg.attributeValue + msg.bonus;
+    const effectiveDice = Number(msg.attributeValue) + Number(msg.bonus);
     sendMessageToChat(`&{template:default} {{name= **ATTRIBUTE ROLL**}} {{Result: = [[${effectiveDice}d6+${msg.skillValue}]]}} {{Destiny: = [[1t[Ability-Destiny]]]}}`);
   } else if (msg.type === 'roll-weapon-attack') {
-    const effectiveDice = msg.attributeValue + msg.bonus;
+    const effectiveDice = Number(msg.attributeValue) + Number(msg.bonus);
     sendMessageToChat(`&{template:default} {{name= **ATTACK ROLL**}} {{Result: = [[${effectiveDice}d6+${msg.skillValue}]]}} {{Destiny: = [[1t[Attack-Destiny]]]}}`);
   } else if (msg.type === 'roll-weapon-damage') {
-    const effectiveDice = msg.diceCount + msg.bonus;
+    const effectiveDice = Number(msg.diceCount) + Number(msg.bonus);
     sendMessageToChat(`&{template:default} {{name= **DAMAGE ROLL**}} {{Result: = [[${effectiveDice}d6+${msg.damageBonus}]]}} {{Destiny: = [[1t[Damage-Destiny]]]}}`);
   } else {
     console.warn('Roll20: Unknown message type:', msg.type);
