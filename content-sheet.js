@@ -7,11 +7,22 @@ if (!document.querySelector('#rc-extension-styles')) {
   style.textContent = `
     .attribute-roll-btn,
     .use-with-attribute-btn,
-    .cancel-roll-btn,
     .weapon-attack-btn,
     .weapon-damage-btn {
-      margin-left: 8px !important;
-      margin-right: 4px !important;
+      margin-left: 4px !important;
+      margin-right: 2px !important;
+      padding: 2px 6px !important;
+      font-size: 16px !important;
+      height: auto !important;
+      min-height: 22px !important;
+      min-width: 22px !important;
+      line-height: 1 !important;
+      cursor: pointer !important;
+    }
+    
+    .cancel-roll-btn {
+      padding: 4px 12px !important;
+      font-size: 13px !important;
     }
   `;
   document.head.appendChild(style);
@@ -21,6 +32,21 @@ if (!document.querySelector('#rc-extension-styles')) {
 let selectedAttribute = null;
 let selectedAttributeValue = null;
 let cancelBtn = null;
+let currentUrl = window.location.href;
+
+// Listen for browser back/forward navigation
+window.addEventListener('popstate', () => {
+  console.log('Browser navigation detected - resetting roll state');
+  resetRollSelection();
+});
+
+// Listen for visibility changes (tab switching)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && selectedAttribute) {
+    console.log('Tab hidden with active roll - maintaining state');
+    // Optionally reset here if you want: resetRollSelection();
+  }
+});
 
 function resetRollSelection() {
   selectedAttribute = null;
@@ -68,7 +94,8 @@ function setupAttributeButtons() {
   // Inject attribute roll button
   if (!nameEl.querySelector('.attribute-roll-btn')) {
     const btn = document.createElement('button');
-    btn.textContent = 'Roll';
+    btn.textContent = '🎲';
+    btn.title = 'Roll Attribute';
     btn.className = 'attribute-roll-btn mantine-Button-root mantine-Button-filled mantine-Button-sm';
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -99,9 +126,10 @@ function setupAttributeButtons() {
         const skillValueEl = document.querySelector(`.skill-value.skill-value-${CSS.escape(skillName)}`);
         const skillValue = skillValueEl ? skillValueEl.textContent.trim() : null;
         
-        if (skillValueEl && !skillValueEl.querySelector('.use-with-attribute-btn')) {
+        if (skillValueEl && !skillNameEl.querySelector('.use-with-attribute-btn')) {
           const skillBtn = document.createElement('button');
-          skillBtn.textContent = 'Roll';
+          skillBtn.textContent = '🎲';
+          skillBtn.title = 'Roll with selected attribute';
           skillBtn.className = 'use-with-attribute-btn mantine-Button-root mantine-Button-subtle mantine-Button-sm';
           skillBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -122,7 +150,7 @@ function setupAttributeButtons() {
             });
             resetRollSelection();
           });
-          skillValueEl.appendChild(skillBtn);
+          skillNameEl.appendChild(skillBtn);
         }
       });
     });
@@ -218,7 +246,8 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
   // Inject attack roll button next to weapon name
   if (attackData && !weaponNameEl.querySelector('.weapon-attack-btn')) {
     const btn = document.createElement('button');
-    btn.textContent = 'Attack';
+    btn.textContent = '🎲';
+    btn.title = 'Attack Roll';
     btn.className = 'weapon-attack-btn mantine-Button-root mantine-Button-filled mantine-Button-sm';
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -263,7 +292,8 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
     
     if (damageData) {
       const damageBtn = document.createElement('button');
-      damageBtn.textContent = 'Damage';
+      damageBtn.textContent = '🎲';
+      damageBtn.title = 'Damage Roll';
       damageBtn.className = 'weapon-damage-btn mantine-Button-root mantine-Button-outline mantine-Button-sm';
       damageBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -290,3 +320,62 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
 
 // Also run weapon setup immediately in case elements are already loaded
 setupWeaponButtons();
+
+// Observe DOM changes to handle dynamically added elements
+function observeDOMChanges() {
+  const observer = new MutationObserver((mutations) => {
+    let shouldCheckAttributes = false;
+    let shouldCheckWeapons = false;
+    
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          // Check if any attribute elements were added
+          if (node.classList?.contains('attribute-name') || 
+              node.querySelector?.('.attribute-name')) {
+            shouldCheckAttributes = true;
+          }
+          
+          // Check if any weapon elements were added
+          if (node.classList?.contains('weapon-name') || 
+              node.querySelector?.('.weapon-name')) {
+            shouldCheckWeapons = true;
+          }
+          
+          // Check if any skill elements were added (for the roll flow)
+          if (node.classList?.contains('skill-name') || 
+              node.querySelector?.('.skill-name')) {
+            if (selectedAttribute) {
+              shouldCheckAttributes = true; // Re-run to add skill buttons
+            }
+          }
+        }
+      });
+    });
+    
+    // Check for URL changes (navigation detection)
+    if (window.location.href !== currentUrl) {
+      currentUrl = window.location.href;
+      resetRollSelection();
+    }
+    
+    // Run setup functions for newly added elements
+    if (shouldCheckAttributes) {
+      setupAttributeButtons();
+    }
+    if (shouldCheckWeapons) {
+      setupWeaponButtons();
+    }
+  });
+  
+  // Start observing the document body for changes
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+  
+  console.log('MutationObserver started - watching for navigation and new elements');
+}
+
+// Start the observer after initial setup
+observeDOMChanges();
