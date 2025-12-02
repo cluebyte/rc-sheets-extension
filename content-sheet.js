@@ -60,10 +60,14 @@ function setupAttributeButtons() {
   if (!attrClass) return;
   const attrKey = attrClass.replace('attribute-name-', '');
 
-  const valueEl = document.querySelector(`.attribute-value.attribute-value-${CSS.escape(attrKey)}`);
-  const attrValue = valueEl ? valueEl.textContent.trim() : null;
-
-  const attrName = nameEl.textContent.trim();
+  // Get attribute name (text only, excluding button text)
+  let attrName = '';
+  nameEl.childNodes.forEach(node => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      attrName += node.textContent;
+    }
+  });
+  attrName = attrName.trim();
   
   // Inject attribute roll button
   if (!nameEl.querySelector('.attribute-roll-btn')) {
@@ -72,6 +76,11 @@ function setupAttributeButtons() {
     btn.className = 'attribute-roll-btn mantine-Button-root mantine-Button-filled mantine-Button-sm';
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
+      
+      // Look up attribute value NOW (at click time), not at setup time
+      const valueEl = document.querySelector(`.attribute-value.attribute-value-${CSS.escape(attrKey)}`);
+      const attrValue = valueEl ? valueEl.textContent.trim() : '0';
+      
       selectedAttribute = attrName;
       selectedAttributeValue = attrValue;
       
@@ -96,8 +105,9 @@ function setupAttributeButtons() {
         if (!skillClass) return;
         const skillName = skillClass.replace('skill-name-', '');
         
+        // Look up skill value NOW (at click time)
         const skillValueEl = document.querySelector(`.skill-value.skill-value-${CSS.escape(skillName)}`);
-        const skillValue = skillValueEl ? skillValueEl.textContent.trim() : null;
+        const skillValue = skillValueEl ? skillValueEl.textContent.trim() : '0';
         
         if (skillValueEl && !skillNameEl.querySelector('.use-with-attribute-btn')) {
           const skillBtn = document.createElement('button');
@@ -366,8 +376,23 @@ function observeDOMChanges() {
     if (window.location.href !== currentUrl) {
       console.log('Navigation detected:', currentUrl, '->', window.location.href);
       currentUrl = window.location.href;
+      
       // Reset attribute roll state on navigation
       resetRollSelection();
+      
+      // If navigating to a character page, remove old buttons and re-setup
+      if (currentUrl.includes('/character/')) {
+        console.log('Navigated to character page - removing old buttons');
+        document.querySelectorAll('.attribute-roll-btn').forEach(btn => btn.remove());
+        document.querySelectorAll('.weapon-attack-btn').forEach(btn => btn.remove());
+        document.querySelectorAll('.weapon-damage-btn').forEach(btn => btn.remove());
+        
+        // Re-run setup after DOM updates
+        setTimeout(() => {
+          setupAttributeButtons();
+          setupWeaponButtons();
+        }, 500);
+      }
     }
     
     // Run setup functions for newly added elements
