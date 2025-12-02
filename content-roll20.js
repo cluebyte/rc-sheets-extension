@@ -1,6 +1,8 @@
 const api = typeof browser !== "undefined" ? browser : chrome;
 
 function sendMessageToChat(msg) {
+  console.debug("Roll20: Sending message to chat:", msg);
+  
   const chatInput = document.querySelector('textarea[title="Text Chat Input"]');
   if (chatInput) {
     chatInput.value = msg;
@@ -15,24 +17,6 @@ function sendMessageToChat(msg) {
     }
   } else {
     console.warn('Roll20: Chat input not found');
-  }
-}
-
-function sendMessageToChat(msg) {
-  const chatInput = document.querySelector('textarea[title="Text Chat Input"]');
-  if (chatInput) {
-    chatInput.value = msg;
-    chatInput.dispatchEvent(new Event('input', { bubbles: true }));
-    
-    // Use the chat send button by id
-    const sendBtn = document.querySelector('#chatSendBtn');
-    if (sendBtn) {
-      sendBtn.click();
-    } else {
-      console.warn('Send button (#chatSendBtn) not found');
-    }
-  } else {
-    console.warn('Chat input not found');
   }
 }
 

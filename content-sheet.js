@@ -43,7 +43,7 @@ function resetRollSelection() {
 
 // Inject attribute roll buttons
 const attributeElements = document.querySelectorAll('.attribute-name');
-console.log('Found', attributeElements.length, 'attribute elements');
+console.debug('Found', attributeElements.length, 'attribute elements');
 
 // Wait for page to load and try again
 setTimeout(() => {
@@ -77,7 +77,7 @@ function setupAttributeButtons() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       
-      // Look up attribute value NOW (at click time), not at setup time
+      // Look up attribute value NOW (at click time).
       const valueEl = document.querySelector(`.attribute-value.attribute-value-${CSS.escape(attrKey)}`);
       const attrValue = valueEl ? valueEl.textContent.trim() : '0';
       
@@ -216,12 +216,11 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
       const skillValueEl = document.querySelector(`.skill-value.skill-value-${CSS.escape(variant)}`);
       if (skillValueEl) {
         skillValue = parseInt(skillValueEl.textContent.trim(), 10) || 0;
-        console.log('Found skill value via DOM class:', variant, '=', skillValue);
+        console.debug('Found skill value via DOM class:', variant, '=', skillValue);
         break;
       }
     }
     
-    // Approach 2: Fallback - find skill by matching display text in DOM
     if (skillValue === 0) {
       document.querySelectorAll('.skill-name').forEach(skillEl => {
         // Get only text content, excluding child elements (like buttons)
@@ -241,7 +240,7 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
             if (skillValueEl) {
               skillValue = parseInt(skillValueEl.textContent.trim(), 10) || 0;
               matchedSkillName = skillDisplayText;
-              console.log('Found skill value via DOM text match:', skillKey, '=', skillValue);
+              console.debug('Found skill value via DOM text match:', skillKey, '=', skillValue);
             }
           }
         }
@@ -374,7 +373,7 @@ function observeDOMChanges() {
     
     // Check for URL changes (SPA navigation detection)
     if (window.location.href !== currentUrl) {
-      console.log('Navigation detected:', currentUrl, '->', window.location.href);
+      console.debug('Navigation detected:', currentUrl, '->', window.location.href);
       currentUrl = window.location.href;
       
       // Reset attribute roll state on navigation
@@ -382,7 +381,7 @@ function observeDOMChanges() {
       
       // If navigating to a character page, remove old buttons and re-setup
       if (currentUrl.includes('/character/')) {
-        console.log('Navigated to character page - removing old buttons');
+        console.debug('Navigated to character page - removing old buttons');
         document.querySelectorAll('.attribute-roll-btn').forEach(btn => btn.remove());
         document.querySelectorAll('.weapon-attack-btn').forEach(btn => btn.remove());
         document.querySelectorAll('.weapon-damage-btn').forEach(btn => btn.remove());
@@ -410,12 +409,12 @@ function observeDOMChanges() {
     subtree: true
   });
   
-  console.log('MutationObserver started - watching for DOM changes and navigation');
+  console.debug('MutationObserver started - watching for DOM changes and navigation');
 }
 
 // Listen for browser back/forward navigation
 window.addEventListener('popstate', () => {
-  console.log('Browser navigation detected (popstate) - resetting roll state');
+  console.debug('Browser navigation detected (popstate) - resetting roll state');
   resetRollSelection();
 });
 
