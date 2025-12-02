@@ -290,3 +290,73 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
 
 // Also run weapon setup immediately in case elements are already loaded
 setupWeaponButtons();
+
+// Track current URL for navigation detection
+let currentUrl = window.location.href;
+
+// MutationObserver to handle dynamic DOM changes
+function observeDOMChanges() {
+  const observer = new MutationObserver((mutations) => {
+    let shouldCheckAttributes = false;
+    let shouldCheckWeapons = false;
+    
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          // Check if any attribute elements were added
+          if (node.classList?.contains('attribute-name') || 
+              node.querySelector?.('.attribute-name')) {
+            shouldCheckAttributes = true;
+          }
+
+          // Check if any weapon elements were added
+          if (node.classList?.contains('weapon-name') || 
+              node.querySelector?.('.weapon-name')) {
+            shouldCheckWeapons = true;
+          }
+
+          // Check if any skill elements were added (for the attribute roll flow)
+          if (node.classList?.contains('skill-name') || 
+              node.querySelector?.('.skill-name')) {
+            if (selectedAttribute) {
+              shouldCheckAttributes = true; // Re-run to add skill buttons
+            }
+          }
+        }
+      });
+    });
+    
+    // Check for URL changes (SPA navigation detection)
+    if (window.location.href !== currentUrl) {
+      console.log('Navigation detected:', currentUrl, '->', window.location.href);
+      currentUrl = window.location.href;
+      // Reset attribute roll state on navigation
+      resetRollSelection();
+    }
+    
+    // Run setup functions for newly added elements
+    if (shouldCheckAttributes) {
+      setupAttributeButtons();
+    }
+    if (shouldCheckWeapons) {
+      setupWeaponButtons();
+    }
+  });
+  
+  // Start observing the document body for changes
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+  
+  console.log('MutationObserver started - watching for DOM changes and navigation');
+}
+
+// Listen for browser back/forward navigation
+window.addEventListener('popstate', () => {
+  console.log('Browser navigation detected (popstate) - resetting roll state');
+  resetRollSelection();
+});
+
+// Start the observer after initial setup
+observeDOMChanges();
