@@ -159,8 +159,8 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
 
   if (!attackSkillText) return;
 
-  // Parse attack skill (e.g., "DEX + Melee(L)" or "STR OR DEX + Athletics")
-  function parseAttackSkill(attackText) {
+  // Parse attack skill text to extract attribute and skill names (not values)
+  function parseAttackSkillText(attackText) {
     // Split by + to get attribute and skill parts
     const parts = attackText.split('+').map(p => p.trim());
     if (parts.length < 2) return null;
@@ -168,6 +168,11 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
     const attributePart = parts[0]; // e.g., "DEX" or "STR OR DEX"
     const skillPart = parts[1]; // e.g., "Melee(L)" or "Athletics"
 
+    return { attributePart, skillPart };
+  }
+
+  // Look up current attribute and skill values from the DOM or cache (called at click time)
+  function getAttackValues(attributePart, skillPart) {
     // Handle OR in attributes - take the highest value
     let bestAttribute = null;
     let bestAttributeValue = 0;
@@ -184,44 +189,75 @@ document.querySelectorAll('.weapon-name').forEach(weaponNameEl => {
       }
     });
 
-    // Get skill value - need to find the skill by matching the display text
+    // Get skill value - try multiple approaches
     let skillValue = 0;
-    let matchedSkillName = null;
+    let matchedSkillName = skillPart;
     
-    // Find skill by iterating through all skill elements and matching display text
-    document.querySelectorAll('.skill-name').forEach(skillEl => {
-      const skillDisplayText = skillEl.textContent.trim();
-      if (skillDisplayText.toLowerCase() === skillPart.toLowerCase()) {
-        // Found matching skill, get its class to find the value
-        const skillClass = Array.from(skillEl.classList).find(c => c.startsWith('skill-name-') && c !== 'skill-name');
-        if (skillClass) {
-          const skillKey = skillClass.replace('skill-name-', '');
-          const skillValueEl = document.querySelector(`.skill-value.skill-value-${CSS.escape(skillKey)}`);
-          if (skillValueEl) {
-            skillValue = parseInt(skillValueEl.textContent.trim(), 10) || 0;
-            matchedSkillName = skillDisplayText;
+    // Approach 1: Try direct class-based lookup with different naming conventions
+    // The class might be "melee-(l)" for skill "Melee(L)"
+    const skillVariants = [
+      skillPart.toLowerCase(),                                    // melee(l)
+      skillPart.toLowerCase().replace('(', '-(').replace(')', ')'), // melee-(l) - actual format!
+      skillPart.toLowerCase().replace('(', '-').replace(')', ''),  // melee-l
+      skillPart.toLowerCase().replace(/[()]/g, ''),               // meleel
+    ];
+    
+    for (const variant of skillVariants) {
+      const skillValueEl = document.querySelector(`.skill-value.skill-value-${CSS.escape(variant)}`);
+      if (skillValueEl) {
+        skillValue = parseInt(skillValueEl.textContent.trim(), 10) || 0;
+        console.log('Found skill value via DOM class:', variant, '=', skillValue);
+        break;
+      }
+    }
+    
+    // Approach 2: Fallback - find skill by matching display text in DOM
+    if (skillValue === 0) {
+      document.querySelectorAll('.skill-name').forEach(skillEl => {
+        // Get only text content, excluding child elements (like buttons)
+        let skillDisplayText = '';
+        skillEl.childNodes.forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            skillDisplayText += node.textContent;
+          }
+        });
+        skillDisplayText = skillDisplayText.trim();
+        
+        if (skillDisplayText.toLowerCase() === skillPart.toLowerCase()) {
+          const skillClass = Array.from(skillEl.classList).find(c => c.startsWith('skill-name-') && c !== 'skill-name');
+          if (skillClass) {
+            const skillKey = skillClass.replace('skill-name-', '');
+            const skillValueEl = document.querySelector(`.skill-value.skill-value-${CSS.escape(skillKey)}`);
+            if (skillValueEl) {
+              skillValue = parseInt(skillValueEl.textContent.trim(), 10) || 0;
+              matchedSkillName = skillDisplayText;
+              console.log('Found skill value via DOM text match:', skillKey, '=', skillValue);
+            }
           }
         }
-      }
-    });
+      });
+    }
 
     return {
       attribute: bestAttribute,
       attributeValue: bestAttributeValue,
-      skill: matchedSkillName || skillPart,
+      skill: matchedSkillName,
       skillValue: skillValue
     };
   }
 
-  const attackData = parseAttackSkill(attackSkillText);
+  const parsedAttack = parseAttackSkillText(attackSkillText);
   
   // Inject attack roll button next to weapon name
-  if (attackData && !weaponNameEl.querySelector('.weapon-attack-btn')) {
+  if (parsedAttack && !weaponNameEl.querySelector('.weapon-attack-btn')) {
     const btn = document.createElement('button');
     btn.textContent = 'Attack';
     btn.className = 'weapon-attack-btn mantine-Button-root mantine-Button-filled mantine-Button-sm';
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
+      
+      // Look up values NOW (at click time), not at setup time
+      const attackData = getAttackValues(parsedAttack.attributePart, parsedAttack.skillPart);
       
       // Prompt for bonus dice
       const bonusInput = prompt(`Attack Roll: ${attackData.attribute} (${attackData.attributeValue}) + ${attackData.skill} (${attackData.skillValue})\n\nEnter bonus dice (+ or - value):`);
