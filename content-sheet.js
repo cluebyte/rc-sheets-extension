@@ -99,7 +99,7 @@ function setupAttributeButtons() {
         const skillValueEl = document.querySelector(`.skill-value.skill-value-${CSS.escape(skillName)}`);
         const skillValue = skillValueEl ? skillValueEl.textContent.trim() : null;
         
-        if (skillValueEl && !skillValueEl.querySelector('.use-with-attribute-btn')) {
+        if (skillValueEl && !skillNameEl.querySelector('.use-with-attribute-btn')) {
           const skillBtn = document.createElement('button');
           skillBtn.textContent = 'Roll';
           skillBtn.className = 'use-with-attribute-btn mantine-Button-root mantine-Button-subtle mantine-Button-sm';
@@ -122,7 +122,7 @@ function setupAttributeButtons() {
             });
             resetRollSelection();
           });
-          skillValueEl.appendChild(skillBtn);
+          skillNameEl.appendChild(skillBtn);
         }
       });
     });
