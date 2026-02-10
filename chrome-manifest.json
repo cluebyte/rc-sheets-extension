@@ -13,6 +13,7 @@
   "permissions": ["tabs", "scripting"],
   "host_permissions": [
     "https://repair-crew-sheets-1zhn.vercel.app/*",
+    "https://repair-crew-sheets.vercel.app/*",
     "https://app.roll20.net/*"
   ],
   "background": {
@@ -21,6 +22,10 @@
   "content_scripts": [
     {
       "matches": ["https://repair-crew-sheets-1zhn.vercel.app/*"],
+      "js": ["content-sheet.js"]
+    },
+    {
+      "matches": ["https://repair-crew-sheets.vercel.app/*"],
       "js": ["content-sheet.js"]
     },
     {
