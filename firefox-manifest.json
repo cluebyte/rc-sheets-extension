@@ -31,6 +31,10 @@
       "js": ["content-sheet.js"]
     },
     {
+      "matches": ["https://repair-crew-sheets.vercel.app/*"],
+      "js": ["content-sheet.js"]
+    },
+    {
       "matches": ["https://app.roll20.net/*"],
       "js": ["content-roll20.js"]
     }
